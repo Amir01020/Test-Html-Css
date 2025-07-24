@@ -396,13 +396,7 @@
         }
       }
   
-            const testShuffle = () => {
-          console.log('Текущий первый вопрос:', questions.value[0].question)
-          questions.value = createShuffledQuestions()
-          console.log('Новый первый вопрос:', questions.value[0].question)
-        }
-  
-        const restartQuiz = () => {
+      const restartQuiz = () => {
         currentQuestion.value = 0
         answers.value = []
         showResults.value = false
