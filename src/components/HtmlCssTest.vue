@@ -125,7 +125,7 @@ export default {
 
     // Telegram Bot Configuration - ЗАМЕНИТЕ НА ВАШИ ДАННЫЕ
     const TELEGRAM_BOT_TOKEN = '7094810717:AAEZd01lcA-Vla4_Lf60Nxg_8foKvwcbkv8' // Замените на ваш токен бота
-    const TELEGRAM_CHAT_ID = '7094810717' // Замените на ваш chat ID
+    const TELEGRAM_CHAT_ID = '6873895827' // Замените на ваш chat ID
 
     const originalQuestions = [
       {
