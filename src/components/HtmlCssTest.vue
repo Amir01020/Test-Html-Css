@@ -3,7 +3,7 @@
   <div v-if="showRegistration" class="registration-overlay">
     <div class="registration-form">
       <div class="registration-icon">📚</div>
-      <h1>HTML & CSS Тест</h1>
+      <h1>Тестирование знаний</h1>
       <p>Добро пожаловать! Пожалуйста, введите ваши данные для начала тестирования</p>
       
       <div class="form-group">
@@ -31,27 +31,49 @@
         class="start-btn"
         :disabled="!canStartTest"
       >
-        Начать тест
+        Далее
       </button>
     </div>
   </div>
 
+  <!-- Выбор теста -->
+  <div v-if="showTestSelection" class="test-selection-overlay">
+    <div class="test-selection-form">
+      <h2>Выберите тест</h2>
+      <p>Привет, {{ userInfo.firstName }}! Какой тест вы хотите пройти?</p>
+      
+      <div class="test-options">
+        <div class="test-option" @click="selectTest('html')">
+          <div class="test-icon">🏷️</div>
+          <h3>HTML</h3>
+          <p>30 вопросов по основам HTML</p>
+        </div>
+        
+        <div class="test-option" @click="selectTest('htmlcss')">
+          <div class="test-icon">🎨</div>
+          <h3>HTML & CSS</h3>
+          <p>50 вопросов по HTML и CSS</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Основной тест -->
-  <div v-else class="test-container">
+  <div v-else-if="!showRegistration && !showTestSelection" class="test-container">
     <div class="header">
-      <h1>HTML & CSS Тест</h1>
-      <p>Привет, {{ userInfo.firstName }}! 50 вопросов для проверки ваших знаний</p>
+      <h1>{{ testTitle }}</h1>
+      <p>Привет, {{ userInfo.firstName }}! {{ testDescription }}</p>
     </div>
 
     <!-- Тест -->
     <div v-if="!showResults" class="quiz-container">
       <div class="question active">
         <div class="question-header">
-          <div class="question-number">Вопрос {{ currentQuestion + 1 }} из 50</div>
+          <div class="question-number">Вопрос {{ currentQuestion + 1 }} из {{ totalQuestions }}</div>
           <div class="progress-bar">
             <div 
               class="progress-fill" 
-              :style="{ width: ((currentQuestion + 1) / 50) * 100 + '%' }"
+              :style="{ width: ((currentQuestion + 1) / totalQuestions) * 100 + '%' }"
             ></div>
           </div>
         </div>
@@ -80,11 +102,11 @@
           </button>
           <button 
             class="btn"
-            :class="currentQuestion === 49 ? 'btn-finish' : 'btn-next'"
-            @click="currentQuestion === 49 ? finishQuiz() : nextQuestion()"
+            :class="currentQuestion === (totalQuestions - 1) ? 'btn-finish' : 'btn-next'"
+            @click="currentQuestion === (totalQuestions - 1) ? finishQuiz() : nextQuestion()"
             :disabled="answers[currentQuestion] === undefined || isSubmitting"
           >
-            {{ isSubmitting ? 'Отправка...' : (currentQuestion === 49 ? 'Завершить тест' : 'Далее') }}
+            {{ isSubmitting ? 'Отправка...' : (currentQuestion === (totalQuestions - 1) ? 'Завершить тест' : 'Далее') }}
           </button>
         </div>
       </div>
@@ -99,6 +121,7 @@
       <p>{{ getResultDescription }}</p>
       <div class="result-info">
         <p><strong>Участник:</strong> {{ userInfo.firstName }} {{ userInfo.lastName }}</p>
+        <p><strong>Тест:</strong> {{ testTitle }}</p>
         <p><strong>Дата:</strong> {{ testDate }}</p>
       </div>
       <button class="restart-btn" @click="restartQuiz">
@@ -118,16 +141,171 @@ export default {
     const answers = ref([])
     const showResults = ref(false)
     const showRegistration = ref(true)
+    const showTestSelection = ref(false)
     const isSubmitting = ref(false)
     const userInfo = ref({ firstName: '', lastName: '' })
     const shuffledQuestions = ref([])
     const testDate = ref('')
+    const selectedTestType = ref('')
 
     // Telegram Bot Configuration - ЗАМЕНИТЕ НА ВАШИ ДАННЫЕ
     const TELEGRAM_BOT_TOKEN = '7094810717:AAEZd01lcA-Vla4_Lf60Nxg_8foKvwcbkv8' // Замените на ваш токен бота
     const TELEGRAM_CHAT_ID = '6873895827' // Замените на ваш chat ID
 
-    const originalQuestions = [
+    const htmlQuestions = [
+      {
+        question: "Что означает HTML?",
+        options: ["HyperText Markup Language", "Home Tool Markup Language", "Hyperlinks and Text Markup Language", "HyperText Modern Language"],
+        correct: 0
+      },
+      {
+        question: "Какой тег используется для создания заголовка первого уровня?",
+        options: ["<h1>", "<header>", "<head>", "<title>"],
+        correct: 0
+      },
+      {
+        question: "Какой атрибут используется для указания источника изображения?",
+        options: ["href", "src", "alt", "link"],
+        correct: 1
+      },
+      {
+        question: "Какой тег используется для создания неупорядоченного списка?",
+        options: ["<ol>", "<ul>", "<li>", "<list>"],
+        correct: 1
+      },
+      {
+        question: "Какой атрибут HTML используется для указания альтернативного текста для изображения?",
+        options: ["title", "alt", "src", "desc"],
+        correct: 1
+      },
+      {
+        question: "Какой тег используется для создания ссылки?",
+        options: ["<link>", "<a>", "<href>", "<url>"],
+        correct: 1
+      },
+      {
+        question: "Какой DOCTYPE используется для HTML5?",
+        options: ["<!DOCTYPE html5>", "<!DOCTYPE HTML>", "<!DOCTYPE html>", "<!DOCTYPE>"],
+        correct: 2
+      },
+      {
+        question: "Какой тег используется для создания таблицы?",
+        options: ["<table>", "<tab>", "<tbl>", "<grid>"],
+        correct: 0
+      },
+      {
+        question: "Какой атрибут используется для объединения ячеек таблицы по горизонтали?",
+        options: ["rowspan", "colspan", "span", "merge"],
+        correct: 1
+      },
+      {
+        question: "Какой тег используется для создания формы?",
+        options: ["<form>", "<input>", "<field>", "<data>"],
+        correct: 0
+      },
+      {
+        question: "Какой тег используется для создания переноса строки?",
+        options: ["<break>", "<br>", "<newline>", "<ln>"],
+        correct: 1
+      },
+      {
+        question: "Какой тег используется для выделения важного текста?",
+        options: ["<important>", "<strong>", "<bold>", "<em>"],
+        correct: 1
+      },
+      {
+        question: "Какой атрибут HTML используется для указания языка страницы?",
+        options: ["language", "lang", "locale", "country"],
+        correct: 1
+      },
+      {
+        question: "Какой тег используется для создания цитаты?",
+        options: ["<quote>", "<blockquote>", "<cite>", "<q>"],
+        correct: 1
+      },
+      {
+        question: "Какой тег используется для создания поля ввода пароля?",
+        options: ["<input type='text'>", "<input type='password'>", "<password>", "<input type='hidden'>"],
+        correct: 1
+      },
+      {
+        question: "Какой тег используется для создания области текста?",
+        options: ["<input type='text'>", "<textarea>", "<textfield>", "<textbox>"],
+        correct: 1
+      },
+      {
+        question: "Какой атрибут HTML используется для открытия ссылки в новом окне?",
+        options: ["target='_blank'", "new-window='true'", "open='new'", "window='new'"],
+        correct: 0
+      },
+      {
+        question: "Какой тег используется для создания выпадающего списка?",
+        options: ["<dropdown>", "<select>", "<list>", "<option>"],
+        correct: 1
+      },
+      {
+        question: "Какой тег используется для группировки элементов формы?",
+        options: ["<group>", "<fieldset>", "<section>", "<div>"],
+        correct: 1
+      },
+      {
+        question: "Какой атрибут HTML делает поле ввода обязательным для заполнения?",
+        options: ["mandatory", "required", "must-fill", "obligatory"],
+        correct: 1
+      },
+      {
+        question: "Какой тег используется для создания заголовка таблицы?",
+        options: ["<th>", "<thead>", "<header>", "<title>"],
+        correct: 0
+      },
+      {
+        question: "Какой тег используется для создания встроенного фрейма?",
+        options: ["<frame>", "<iframe>", "<embed>", "<object>"],
+        correct: 1
+      },
+      {
+        question: "Какой тег используется для создания горизонтальной линии?",
+        options: ["<line>", "<hr>", "<hline>", "<horizontal>"],
+        correct: 1
+      },
+      {
+        question: "Какой тег используется для создания абзаца?",
+        options: ["<paragraph>", "<p>", "<para>", "<text>"],
+        correct: 1
+      },
+      {
+        question: "Какой атрибут используется для указания уникального идентификатора элемента?",
+        options: ["class", "id", "name", "unique"],
+        correct: 1
+      },
+      {
+        question: "Какой тег используется для создания курсивного текста?",
+        options: ["<italic>", "<i>", "<em>", "<cursive>"],
+        correct: 1
+      },
+      {
+        question: "Какой тег используется для создания подчеркнутого текста?",
+        options: ["<underline>", "<u>", "<under>", "<line>"],
+        correct: 1
+      },
+      {
+        question: "Какой атрибут используется для указания заголовка элемента (всплывающая подсказка)?",
+        options: ["tooltip", "title", "hint", "description"],
+        correct: 1
+      },
+      {
+        question: "Какой тег используется для создания упорядоченного списка?",
+        options: ["<ul>", "<ol>", "<list>", "<ordered>"],
+        correct: 1
+      },
+      {
+        question: "Какой тег используется для указания метаданных HTML-документа?",
+        options: ["<metadata>", "<meta>", "<info>", "<data>"],
+        correct: 1
+      }
+    ]
+
+    const htmlCssQuestions = [
       {
         question: "Что означает HTML?",
         options: ["HyperText Markup Language", "Home Tool Markup Language", "Hyperlinks and Text Markup Language", "HyperText Modern Language"],
@@ -399,6 +577,20 @@ export default {
       return userInfo.value.firstName.trim() && userInfo.value.lastName.trim()
     })
 
+    const totalQuestions = computed(() => {
+      return shuffledQuestions.value.length
+    })
+
+    const testTitle = computed(() => {
+      return selectedTestType.value === 'html' ? 'HTML Тест' : 'HTML & CSS Тест'
+    })
+
+    const testDescription = computed(() => {
+      const count = selectedTestType.value === 'html' ? '30' : '50'
+      const subject = selectedTestType.value === 'html' ? 'HTML' : 'HTML и CSS'
+      return `${count} вопросов для проверки ваших знаний ${subject}`
+    })
+
     const score = computed(() => {
       let correctAnswers = 0
       for (let i = 0; i < shuffledQuestions.value.length; i++) {
@@ -428,16 +620,17 @@ export default {
     })
 
     const getResultDescription = computed(() => {
+      const subject = selectedTestType.value === 'html' ? 'HTML' : 'HTML и CSS'
       const baseText = `Вы ответили правильно на ${score.value} из ${shuffledQuestions.value.length} вопросов.`
       
       if (percentage.value >= 90) {
-        return `${baseText} У вас отличные знания HTML и CSS!`
+        return `${baseText} У вас отличные знания ${subject}!`
       } else if (percentage.value >= 70) {
         return `${baseText} Хорошие знания, но есть куда стремиться!`
       } else if (percentage.value >= 50) {
         return `${baseText} Базовые знания есть, но нужно подтянуть теорию.`
       } else {
-        return `${baseText} Рекомендуем изучить основы HTML и CSS.`
+        return `${baseText} Рекомендуем изучить основы ${subject}.`
       }
     })
 
@@ -445,12 +638,25 @@ export default {
     const handleRegistration = () => {
       if (canStartTest.value) {
         showRegistration.value = false
+        showTestSelection.value = true
+      }
+    }
+
+    const selectTest = (testType) => {
+      selectedTestType.value = testType
+      showTestSelection.value = false
+      
+      if (testType === 'html') {
+        shuffledQuestions.value = shuffleArray(htmlQuestions)
+      } else {
+        shuffledQuestions.value = shuffleArray(htmlCssQuestions)
       }
     }
 
     const sendToTelegram = async () => {
+      const testName = selectedTestType.value === 'html' ? 'HTML' : 'HTML & CSS'
       const message = `
-🎯 Результат теста HTML & CSS
+🎯 Результат теста ${testName}
 
 👤 Участник: ${userInfo.value.firstName} ${userInfo.value.lastName}
 📊 Результат: ${score.value}/${shuffledQuestions.value.length} (${percentage.value}%)
@@ -516,31 +722,34 @@ ${getResultDescription.value}
       answers.value = []
       showResults.value = false
       showRegistration.value = true
+      showTestSelection.value = false
       userInfo.value = { firstName: '', lastName: '' }
-      shuffledQuestions.value = shuffleArray(originalQuestions)
+      selectedTestType.value = ''
+      shuffledQuestions.value = []
     }
-
-    // Инициализация при монтировании компонента
-    onMounted(() => {
-      shuffledQuestions.value = shuffleArray(originalQuestions)
-    })
 
     return {
       currentQuestion,
       answers,
       showResults,
       showRegistration,
+      showTestSelection,
       isSubmitting,
       userInfo,
       testDate,
+      selectedTestType,
       getCurrentQuestion,
       canStartTest,
+      totalQuestions,
+      testTitle,
+      testDescription,
       score,
       percentage,
       getScoreClass,
       getResultTitle,
       getResultDescription,
       handleRegistration,
+      selectTest,
       selectOption,
       nextQuestion,
       prevQuestion,
@@ -642,6 +851,85 @@ ${getResultDescription.value}
 .start-btn:disabled {
   background: #ccc;
   cursor: not-allowed;
+}
+
+/* Выбор теста */
+.test-selection-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  z-index: 1000;
+}
+
+.test-selection-form {
+  background: white;
+  border-radius: 20px;
+  padding: 40px;
+  box-shadow: 0 25px 50px rgba(0,0,0,0.3);
+  max-width: 600px;
+  width: 90%;
+  text-align: center;
+}
+
+.test-selection-form h2 {
+  font-size: 2.2em;
+  margin-bottom: 10px;
+  color: #333;
+  font-weight: bold;
+}
+
+.test-selection-form p {
+  font-size: 1.2em;
+  color: #666;
+  margin-bottom: 40px;
+}
+
+.test-options {
+  display: flex;
+  gap: 30px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.test-option {
+  background: #f8f9fa;
+  border: 3px solid transparent;
+  border-radius: 15px;
+  padding: 30px 20px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  min-width: 200px;
+  text-align: center;
+}
+
+.test-option:hover {
+  border-color: #2196F3;
+  transform: translateY(-5px);
+  box-shadow: 0 15px 30px rgba(33, 150, 243, 0.2);
+}
+
+.test-icon {
+  font-size: 3em;
+  margin-bottom: 15px;
+}
+
+.test-option h3 {
+  font-size: 1.5em;
+  margin-bottom: 10px;
+  color: #333;
+}
+
+.test-option p {
+  color: #666;
+  margin: 0;
+  font-size: 1em;
 }
 
 /* Основной тест */
@@ -871,5 +1159,38 @@ ${getResultDescription.value}
 
 .restart-btn:hover {
   background: #0056b3;
+}
+
+/* Адаптивный дизайн */
+@media (max-width: 768px) {
+  .test-options {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .test-option {
+    min-width: auto;
+    width: 100%;
+    max-width: 300px;
+  }
+  
+  .question-header {
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .progress-bar {
+    margin: 0;
+    width: 100%;
+  }
+  
+  .navigation {
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .btn {
+    width: 100%;
+  }
 }
 </style>
