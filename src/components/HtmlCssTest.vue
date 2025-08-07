@@ -54,6 +54,12 @@
           <h3>HTML & CSS</h3>
           <p>50 вопросов по HTML и CSS</p>
         </div>
+        
+        <div class="test-option" @click="selectTest('python')">
+          <div class="test-icon">🐍</div>
+          <h3>Python</h3>
+          <p>40 вопросов по основам Python</p>
+        </div>
       </div>
     </div>
   </div>
@@ -135,7 +141,7 @@
 import { ref, computed, onMounted } from 'vue'
 
 export default {
-  name: 'HtmlCssTest',
+  name: 'TestingComponent',
   setup() {
     const currentQuestion = ref(0)
     const answers = ref([])
@@ -558,6 +564,214 @@ export default {
       }
     ]
 
+    const pythonQuestions = [
+      {
+        question: "Что такое Python?",
+        options: ["Язык программирования", "Текстовый редактор", "Операционная система", "База данных"],
+        correct: 0
+      },
+      {
+        question: "Какой символ используется для комментариев в Python?",
+        options: ["//", "/*", "#", "<!--"],
+        correct: 2
+      },
+      {
+        question: "Какая функция используется для вывода текста в Python?",
+        options: ["echo", "printf", "print", "write"],
+        correct: 2
+      },
+      {
+        question: "Какой тип данных представляет целые числа в Python?",
+        options: ["int", "integer", "number", "digit"],
+        correct: 0
+      },
+      {
+        question: "Как создать список в Python?",
+        options: ["list = (1, 2, 3)", "list = [1, 2, 3]", "list = {1, 2, 3}", "list = 1, 2, 3"],
+        correct: 1
+      },
+      {
+        question: "Какой оператор используется для возведения в степень в Python?",
+        options: ["^", "**", "pow", "^2"],
+        correct: 1
+      },
+      {
+        question: "Как получить длину списка в Python?",
+        options: ["length(list)", "size(list)", "len(list)", "count(list)"],
+        correct: 2
+      },
+      {
+        question: "Какая функция преобразует строку в число в Python?",
+        options: ["int()", "number()", "convert()", "parse()"],
+        correct: 0
+      },
+      {
+        question: "Какой символ используется для объединения строк в Python?",
+        options: ["&", "+", ".", "||"],
+        correct: 1
+      },
+      {
+        question: "Как проверить тип переменной в Python?",
+        options: ["typeof()", "type()", "gettype()", "vartype()"],
+        correct: 1
+      },
+      {
+        question: "Какое ключевое слово используется для определения функции в Python?",
+        options: ["function", "def", "func", "define"],
+        correct: 1
+      },
+      {
+        question: "Какой цикл используется для перебора элементов в Python?",
+        options: ["foreach", "for", "while", "loop"],
+        correct: 1
+      },
+      {
+        question: "Как добавить элемент в конец списка в Python?",
+        options: ["append()", "add()", "insert()", "push()"],
+        correct: 0
+      },
+      {
+        question: "Какое ключевое слово используется для условных операторов в Python?",
+        options: ["if", "when", "condition", "check"],
+        correct: 0
+      },
+      {
+        question: "Как создать словарь в Python?",
+        options: ["dict = [key: value]", "dict = (key: value)", "dict = {key: value}", "dict = <key: value>"],
+        correct: 2
+      },
+      {
+        question: "Какой оператор используется для проверки принадлежности элемента в Python?",
+        options: ["in", "contains", "exists", "has"],
+        correct: 0
+      },
+      {
+        question: "Как получить символ строки по индексу в Python?",
+        options: ["string.charAt(index)", "string[index]", "string.get(index)", "string(index)"],
+        correct: 1
+      },
+      {
+        question: "Какая функция возвращает случайное число в Python?",
+        options: ["random()", "rand()", "rnd()", "random.random()"],
+        correct: 3
+      },
+      {
+        question: "Как импортировать модуль в Python?",
+        options: ["include", "import", "require", "use"],
+        correct: 1
+      },
+      {
+        question: "Какой метод используется для разделения строки в Python?",
+        options: ["split()", "divide()", "separate()", "break()"],
+        correct: 0
+      },
+      {
+        question: "Как удалить элемент из списка по значению в Python?",
+        options: ["delete()", "remove()", "pop()", "clear()"],
+        correct: 1
+      },
+      {
+        question: "Какое значение возвращает функция, если не указан return в Python?",
+        options: ["0", "False", "None", "null"],
+        correct: 2
+      },
+      {
+        question: "Как создать кортеж в Python?",
+        options: ["tuple = [1, 2, 3]", "tuple = (1, 2, 3)", "tuple = {1, 2, 3}", "tuple = 1, 2, 3"],
+        correct: 1
+      },
+      {
+        question: "Какой метод преобразует все символы строки в верхний регистр в Python?",
+        options: ["uppercase()", "upper()", "toUpper()", "capitalize()"],
+        correct: 1
+      },
+      {
+        question: "Как проверить, является ли строка числом в Python?",
+        options: ["isdigit()", "isnumber()", "isnumeric()", "Все варианты верны"],
+        correct: 3
+      },
+      {
+        question: "Какая функция открывает файл в Python?",
+        options: ["open()", "file()", "read()", "load()"],
+        correct: 0
+      },
+      {
+        question: "Какой оператор используется для целочисленного деления в Python?",
+        options: ["/", "//", "div", "\\"],
+        correct: 1
+      },
+      {
+        question: "Как получить остаток от деления в Python?",
+        options: ["mod", "%", "remainder", "//"],
+        correct: 1
+      },
+      {
+        question: "Какое ключевое слово используется для обработки исключений в Python?",
+        options: ["try", "catch", "exception", "error"],
+        correct: 0
+      },
+      {
+        question: "Как создать множество в Python?",
+        options: ["set = [1, 2, 3]", "set = (1, 2, 3)", "set = {1, 2, 3}", "set = <1, 2, 3>"],
+        correct: 2
+      },
+      {
+        question: "Какой метод используется для добавления элемента в множество в Python?",
+        options: ["append()", "add()", "insert()", "put()"],
+        correct: 1
+      },
+      {
+        question: "Что делает функция range() в Python?",
+        options: ["Создает список чисел", "Создает строку", "Создает итератор чисел", "Создает словарь"],
+        correct: 2
+      },
+      {
+        question: "Какой метод используется для получения всех ключей словаря в Python?",
+        options: ["keys()", "getKeys()", "allKeys()", "keyList()"],
+        correct: 0
+      },
+      {
+        question: "Как проверить, пуст ли список в Python?",
+        options: ["if list == []:", "if len(list) == 0:", "if not list:", "Все варианты верны"],
+        correct: 3
+      },
+      {
+        question: "Какое ключевое слово используется для создания класса в Python?",
+        options: ["class", "object", "def", "create"],
+        correct: 0
+      },
+      {
+        question: "Какой метод используется для сортировки списка в Python?",
+        options: ["sort()", "order()", "arrange()", "organize()"],
+        correct: 0
+      },
+      {
+        question: "Как получить максимальное значение из списка в Python?",
+        options: ["maximum()", "max()", "largest()", "top()"],
+        correct: 1
+      },
+      {
+        question: "Какая функция возвращает абсолютное значение числа в Python?",
+        options: ["absolute()", "abs()", "positive()", "unsigned()"],
+        correct: 1
+      },
+      {
+        question: "Как объединить два списка в Python?",
+        options: ["list1.merge(list2)", "list1 + list2", "list1.append(list2)", "list1.join(list2)"],
+        correct: 1
+      },
+      {
+        question: "Какой символ используется для экранирования специальных символов в строке Python?",
+        options: ["/", "\\", "^", "&"],
+        correct: 1
+      },
+      {
+        question: "Какая функция преобразует число в строку в Python?",
+        options: ["string()", "str()", "toString()", "convert()"],
+        correct: 1
+      }
+    ]
+
     // Функция перемешивания массива
     const shuffleArray = (array) => {
       const shuffled = [...array]
@@ -582,12 +796,24 @@ export default {
     })
 
     const testTitle = computed(() => {
-      return selectedTestType.value === 'html' ? 'HTML Тест' : 'HTML & CSS Тест'
+      if (selectedTestType.value === 'html') return 'HTML Тест'
+      if (selectedTestType.value === 'htmlcss') return 'HTML & CSS Тест'
+      if (selectedTestType.value === 'python') return 'Python Тест'
+      return 'Тест'
     })
 
     const testDescription = computed(() => {
-      const count = selectedTestType.value === 'html' ? '30' : '50'
-      const subject = selectedTestType.value === 'html' ? 'HTML' : 'HTML и CSS'
+      let count, subject
+      if (selectedTestType.value === 'html') {
+        count = '30'
+        subject = 'HTML'
+      } else if (selectedTestType.value === 'htmlcss') {
+        count = '50'
+        subject = 'HTML и CSS'
+      } else if (selectedTestType.value === 'python') {
+        count = '40'
+        subject = 'Python'
+      }
       return `${count} вопросов для проверки ваших знаний ${subject}`
     })
 
@@ -620,7 +846,11 @@ export default {
     })
 
     const getResultDescription = computed(() => {
-      const subject = selectedTestType.value === 'html' ? 'HTML' : 'HTML и CSS'
+      let subject
+      if (selectedTestType.value === 'html') subject = 'HTML'
+      else if (selectedTestType.value === 'htmlcss') subject = 'HTML и CSS'
+      else if (selectedTestType.value === 'python') subject = 'Python'
+      
       const baseText = `Вы ответили правильно на ${score.value} из ${shuffledQuestions.value.length} вопросов.`
       
       if (percentage.value >= 90) {
@@ -648,13 +878,19 @@ export default {
       
       if (testType === 'html') {
         shuffledQuestions.value = shuffleArray(htmlQuestions)
-      } else {
+      } else if (testType === 'htmlcss') {
         shuffledQuestions.value = shuffleArray(htmlCssQuestions)
+      } else if (testType === 'python') {
+        shuffledQuestions.value = shuffleArray(pythonQuestions)
       }
     }
 
     const sendToTelegram = async () => {
-      const testName = selectedTestType.value === 'html' ? 'HTML' : 'HTML & CSS'
+      let testName
+      if (selectedTestType.value === 'html') testName = 'HTML'
+      else if (selectedTestType.value === 'htmlcss') testName = 'HTML & CSS'
+      else if (selectedTestType.value === 'python') testName = 'Python'
+      
       const message = `
 🎯 Результат теста ${testName}
 
@@ -873,7 +1109,7 @@ ${getResultDescription.value}
   border-radius: 20px;
   padding: 40px;
   box-shadow: 0 25px 50px rgba(0,0,0,0.3);
-  max-width: 600px;
+  max-width: 800px;
   width: 90%;
   text-align: center;
 }
@@ -907,6 +1143,8 @@ ${getResultDescription.value}
   transition: all 0.3s ease;
   min-width: 200px;
   text-align: center;
+  flex: 1;
+  max-width: 250px;
 }
 
 .test-option:hover {
